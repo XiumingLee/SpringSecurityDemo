@@ -40,10 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //允许所有用户访问"/"和"/api/login"
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/api/needAdmin").hasRole("ADMIN")
-                .antMatchers("/api/needRoot").hasRole("ROOT")
-                //其他地址的访问均需验证权限
-                .anyRequest().authenticated();
+                //其他地址的访问均需验证权限,参数Spring会自动注入进去
+                .anyRequest().access("@rbacService.hasPermission(request,authentication)");
 
         // AccessDeniedHandler处理器 拒绝访问时的处理器
         http.exceptionHandling()
