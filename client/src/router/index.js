@@ -11,15 +11,20 @@ const constantRouterMap = [
         hidden: true
     },
     {
-        path:'/request',
-        component:()=>import('@/views/request-test/request-test'),
-        meta:{ title:'request' },
+        path:'/login',
+        component:()=>import('@/views/login/login'),
+        meta:{ title:'登录页面' },
+        hidden: true
+    },
+    {
+        path:'/authority',
+        component:()=>import('@/views/authority/authority'),
+        meta:{ title:'权限测试页面' },
         hidden: true
     },
 
 ]
 
 export default new Router({
-    scrollBehavior: () => ({ y: 0 }),
     routes: constantRouterMap
 })
