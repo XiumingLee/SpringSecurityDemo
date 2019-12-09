@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCo
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 /**
  * @Author Xiuming Lee
@@ -43,6 +44,9 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
 
     @Autowired
     private MingSecurityUserDetailsService mingSecurityUserDetailsService;
+
+    @Autowired
+    private JwtAccessTokenConverter accessTokenConverter;
 
 
     @Override
@@ -85,6 +89,7 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
         service.setClientDetailsService(clientDetailsService);
         service.setSupportRefreshToken(true);
         service.setTokenStore(tokenStore);
+        service.setTokenEnhancer(accessTokenConverter); // **添加的这里
         service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
         service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
         return service;
