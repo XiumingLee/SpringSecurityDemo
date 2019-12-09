@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     // 资源服务id
-    public static final String RESOURCE_ID = "client1";
+    public static final String RESOURCE_ID = "client_1";
 
     @Autowired
     private RequestAccessDeniedHandler requestAccessDeniedHandler;

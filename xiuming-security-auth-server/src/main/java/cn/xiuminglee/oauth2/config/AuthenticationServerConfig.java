@@ -13,12 +13,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+
+import javax.sql.DataSource;
 
 /**
  * @Author Xiuming Lee
@@ -27,6 +30,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 @Configuration
 @EnableAuthorizationServer
 public class AuthenticationServerConfig extends AuthorizationServerConfigurerAdapter {
+
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -49,17 +53,27 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
     private JwtAccessTokenConverter accessTokenConverter;
 
 
+    // 设置客户端信息从数据库中取
+    @Bean
+    public ClientDetailsService clientDetailsService(DataSource dataSource) {
+        JdbcClientDetailsService jdbcClientDetailsService = new JdbcClientDetailsService(dataSource);
+        jdbcClientDetailsService.setPasswordEncoder(passwordEncoder);
+        return jdbcClientDetailsService;
+    }
+
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
-                .withClient("client1")
-                .secret(passwordEncoder.encode("123456"))
-                // 该client允许的授权类型 authorization_code,password,refresh_token,implicit,client_credentials
-                .authorizedGrantTypes("authorization_code", "password","client_credentials","implicit","refresh_token")
-                .scopes("all")
-                .autoApprove(false)
-                // 加上验证回调地址
-                .redirectUris("http://example.com/");
+        // 设置客户端信息从数据库中取
+        clients.withClientDetails(clientDetailsService);
+        //clients.inMemory()
+        //        .withClient("client1")
+        //        .secret(passwordEncoder.encode("123456"))
+        //        // 该client允许的授权类型 authorization_code,password,refresh_token,implicit,client_credentials
+        //        .authorizedGrantTypes("authorization_code", "password","client_credentials","implicit","refresh_token")
+        //        .scopes("all")
+        //        .autoApprove(false)
+        //        // 加上验证回调地址
+        //        .redirectUris("http://example.com/");
     }
 
     /** 令牌访问端点 */
@@ -96,8 +110,10 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
     }
 
     @Bean
-    public AuthorizationCodeServices authorizationCodeServices() {
+    public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
         //设置授权码模式的授权码如何 存取，暂时采用内存方式
-        return new InMemoryAuthorizationCodeServices();
+        //return new InMemoryAuthorizationCodeServices();
+        // 修改为使用数据库的模式
+        return new JdbcAuthorizationCodeServices(dataSource);//设置授权码模式的授权码如何存取
     }
 }
