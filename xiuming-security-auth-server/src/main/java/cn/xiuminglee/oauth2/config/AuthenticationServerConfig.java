@@ -49,8 +49,8 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
     @Autowired
     private MingSecurityUserDetailsService mingSecurityUserDetailsService;
 
-    @Autowired
-    private JwtAccessTokenConverter accessTokenConverter;
+    @Autowired(required = false)
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
 
 
     // 设置客户端信息从数据库中取
@@ -65,15 +65,6 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         // 设置客户端信息从数据库中取
         clients.withClientDetails(clientDetailsService);
-        //clients.inMemory()
-        //        .withClient("client1")
-        //        .secret(passwordEncoder.encode("123456"))
-        //        // 该client允许的授权类型 authorization_code,password,refresh_token,implicit,client_credentials
-        //        .authorizedGrantTypes("authorization_code", "password","client_credentials","implicit","refresh_token")
-        //        .scopes("all")
-        //        .autoApprove(false)
-        //        // 加上验证回调地址
-        //        .redirectUris("http://example.com/");
     }
 
     /** 令牌访问端点 */
@@ -103,7 +94,9 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
         service.setClientDetailsService(clientDetailsService);
         service.setSupportRefreshToken(true);
         service.setTokenStore(tokenStore);
-        service.setTokenEnhancer(accessTokenConverter); // **添加的这里
+        if (jwtAccessTokenConverter != null){ // 如果容器中存在jwtAccessTokenConverter，则添加。
+            service.setTokenEnhancer(jwtAccessTokenConverter);
+        }
         service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
         service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
         return service;
