@@ -26,9 +26,12 @@ public class TokenConfig {
     public static class JwtConfig {
         private String SIGNING_KEY = "Ming";
 
+        @Autowired
+        private JwtAccessTokenConverter jwtAccessTokenConverter;
+
         @Bean
         public TokenStore tokenStore() {
-            return new JwtTokenStore(jwtAccessTokenConverter());
+            return new JwtTokenStore(jwtAccessTokenConverter);
         }
 
         @Bean

@@ -1,5 +1,8 @@
 package cn.xiuminglee.security.config;
 
+import cn.xiuminglee.security.handler.LoginFailureHandle;
+import cn.xiuminglee.security.handler.LoginSuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,11 +20,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    private LoginSuccessHandler loginSuccessHandler;
+    @Autowired
+    private LoginFailureHandle loginFailureHandle;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.formLogin()
-                .loginProcessingUrl("/api/login");
+                .loginProcessingUrl("/api/login")
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandle);
 
         //允许所有用户访问"/"和"/api/login"
         http.authorizeRequests()

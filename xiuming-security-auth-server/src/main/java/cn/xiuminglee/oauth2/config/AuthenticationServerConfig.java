@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -32,11 +32,15 @@ import javax.sql.DataSource;
 public class AuthenticationServerConfig extends AuthorizationServerConfigurerAdapter {
 
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    //@Autowired
+    //private PasswordEncoder passwordEncoder;
 
     @Autowired
     private TokenStore tokenStore;
+
+    @Autowired(required = false)
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
+
     @Autowired
     private ClientDetailsService clientDetailsService;
 
@@ -49,15 +53,14 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
     @Autowired
     private MingSecurityUserDetailsService mingSecurityUserDetailsService;
 
-    @Autowired(required = false)
-    private JwtAccessTokenConverter jwtAccessTokenConverter;
+
 
 
     // 设置客户端信息从数据库中取
     @Bean
     public ClientDetailsService clientDetailsService(DataSource dataSource) {
         JdbcClientDetailsService jdbcClientDetailsService = new JdbcClientDetailsService(dataSource);
-        jdbcClientDetailsService.setPasswordEncoder(passwordEncoder);
+        jdbcClientDetailsService.setPasswordEncoder(new BCryptPasswordEncoder());
         return jdbcClientDetailsService;
     }
 
@@ -94,6 +97,7 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
         service.setClientDetailsService(clientDetailsService);
         service.setSupportRefreshToken(true);
         service.setTokenStore(tokenStore);
+        //service.setTokenEnhancer(tokenStore.);
         if (jwtAccessTokenConverter != null){ // 如果容器中存在jwtAccessTokenConverter，则添加。
             service.setTokenEnhancer(jwtAccessTokenConverter);
         }
