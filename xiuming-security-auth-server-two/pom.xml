@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>xiuming-security-auth-server</artifactId>
+    <artifactId>xiuming-security-auth-server-two</artifactId>
 
     <dependencies>
         <dependency>

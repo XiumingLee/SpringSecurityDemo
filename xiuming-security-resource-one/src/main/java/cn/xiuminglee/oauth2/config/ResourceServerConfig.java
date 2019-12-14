@@ -6,4 +6,5 @@ package cn.xiuminglee.oauth2.config;
  */
 
 public class ResourceServerConfig {
+
 }

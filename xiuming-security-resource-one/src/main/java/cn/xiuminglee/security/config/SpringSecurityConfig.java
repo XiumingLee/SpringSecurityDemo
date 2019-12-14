@@ -1,5 +1,6 @@
 package cn.xiuminglee.security.config;
 
+import cn.xiuminglee.security.handle.LoginSuccessHandler;
 import cn.xiuminglee.security.handle.RequestAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
@@ -17,6 +18,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private RequestAccessDeniedHandler requestAccessDeniedHandler;
+
+    @Autowired
+    private LoginSuccessHandler loginSuccessHandler;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
