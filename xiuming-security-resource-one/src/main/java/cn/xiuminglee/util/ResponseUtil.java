@@ -27,6 +27,7 @@ public class ResponseUtil<T> implements Serializable {
 
     public enum ResponseCode{
         SUCCESS("200"),
+        NEED_LOGIN("403"),
         ERR("500");
         private final String value;
 

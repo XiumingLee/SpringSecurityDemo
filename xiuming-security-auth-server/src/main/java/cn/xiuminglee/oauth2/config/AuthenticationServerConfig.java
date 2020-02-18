@@ -30,26 +30,12 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        // 定义了两个客户端应用的通行证
-        /**
-        必须设置回调地址redirectUris,并且格式是`http://客户端IP:端口/login`的格式，
-        否则会报:
-        OAuth Error error=”invalid_request”,
-        error_description=”At least one redirect_uri must be registered with the client.”
-        的错误
-        */
+
         clients.inMemory()
                 .withClient("client1")
                 .secret(passwordEncoder.encode("123456"))
                 .authorizedGrantTypes("authorization_code","refresh_token")
-                .redirectUris("http://127.0.0.1:8011/login")
-                .scopes("all")
-                .autoApprove(false)
-                .and()
-                .withClient("client2")
-                .secret(passwordEncoder.encode("123456"))
-                .redirectUris("http://127.0.0.1:8012/login")
-                .authorizedGrantTypes("authorization_code", "refresh_token")
+                .redirectUris("http://127.0.0.1:3000/auth_code")
                 .scopes("all")
                 .autoApprove(false);
     }
@@ -59,12 +45,13 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints.userDetailsService(mingSecurityUserDetailService);
         endpoints.tokenStore(jwtTokenStore()).accessTokenConverter(jwtAccessTokenConverter());
+        endpoints.pathMapping("/oauth/confirm_access","/custom/confirm_access"); //使用自己的页面替换授权页面
     }
 
     /** 令牌访问端点的安全策略 */
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.tokenKeyAccess("isAuthenticated()");
+        security.tokenKeyAccess("permitAll()");
     }
 
     @Bean
